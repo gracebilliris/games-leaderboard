@@ -234,10 +234,11 @@ async function loadGallery() {
 
     const card = document.getElementById('gallery-card');
     const gallery = document.getElementById('gallery');
-    gallery.innerHTML = items.map(item => {
+    const srcs = items.map(item => 'photos/' + (typeof item === 'string' ? item : item.src));
+    gallery.innerHTML = items.map((item, i) => {
       const src = typeof item === 'string' ? item : item.src;
       const caption = typeof item === 'string' ? '' : (item.caption || '');
-      return `<figure data-src="photos/${src}">
+      return `<figure data-index="${i}">
         <img src="photos/${src}" alt="${caption}" loading="lazy" />
         ${caption ? `<figcaption>${caption}</figcaption>` : ''}
       </figure>`;
@@ -246,15 +247,38 @@ async function loadGallery() {
 
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
+    const counter = document.getElementById('lightbox-counter');
+    let currentIndex = -1;
+
+    const show = (i) => {
+      currentIndex = (i + srcs.length) % srcs.length;
+      lightboxImg.src = srcs[currentIndex];
+      counter.textContent = `${currentIndex + 1} / ${srcs.length}`;
+      lightbox.hidden = false;
+    };
+    const close = () => { lightbox.hidden = true; lightboxImg.src = ''; currentIndex = -1; };
+
     gallery.addEventListener('click', (e) => {
       const fig = e.target.closest('figure');
       if (!fig) return;
-      lightboxImg.src = fig.dataset.src;
-      lightbox.hidden = false;
+      show(parseInt(fig.dataset.index, 10));
     });
-    lightbox.addEventListener('click', () => { lightbox.hidden = true; lightboxImg.src = ''; });
+    document.getElementById('lightbox-prev').addEventListener('click', (e) => {
+      e.stopPropagation();
+      show(currentIndex - 1);
+    });
+    document.getElementById('lightbox-next').addEventListener('click', (e) => {
+      e.stopPropagation();
+      show(currentIndex + 1);
+    });
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target === lightboxImg) close();
+    });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { lightbox.hidden = true; lightboxImg.src = ''; }
+      if (lightbox.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') show(currentIndex - 1);
+      else if (e.key === 'ArrowRight') show(currentIndex + 1);
     });
   } catch (_) {}
 }

@@ -63,7 +63,12 @@
     <section class="card" id="gallery-card" hidden>
       <div class="section-head"><h2>📸 Gallery</h2></div>
       <div id="gallery" class="gallery"></div>
-      <div id="lightbox" class="lightbox" hidden><img id="lightbox-img" alt=""/></div>
+      <div id="lightbox" class="lightbox" hidden>
+        <button class="lightbox-nav prev" id="lightbox-prev" aria-label="Previous">‹</button>
+        <img id="lightbox-img" alt=""/>
+        <button class="lightbox-nav next" id="lightbox-next" aria-label="Next">›</button>
+        <div class="lightbox-counter" id="lightbox-counter"></div>
+      </div>
     </section>
 
     <section class="card">
