@@ -223,4 +223,38 @@ function renderAll() {
   });
 }
 
-loadData().then(renderAll);
+loadData().then(renderAll).then(loadGallery);
+
+async function loadGallery() {
+  try {
+    const res = await fetch('photos/manifest.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const items = await res.json();
+    if (!Array.isArray(items) || items.length === 0) return;
+
+    const card = document.getElementById('gallery-card');
+    const gallery = document.getElementById('gallery');
+    gallery.innerHTML = items.map(item => {
+      const src = typeof item === 'string' ? item : item.src;
+      const caption = typeof item === 'string' ? '' : (item.caption || '');
+      return `<figure data-src="photos/${src}">
+        <img src="photos/${src}" alt="${caption}" loading="lazy" />
+        ${caption ? `<figcaption>${caption}</figcaption>` : ''}
+      </figure>`;
+    }).join('');
+    card.hidden = false;
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    gallery.addEventListener('click', (e) => {
+      const fig = e.target.closest('figure');
+      if (!fig) return;
+      lightboxImg.src = fig.dataset.src;
+      lightbox.hidden = false;
+    });
+    lightbox.addEventListener('click', () => { lightbox.hidden = true; lightboxImg.src = ''; });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { lightbox.hidden = true; lightboxImg.src = ''; }
+    });
+  } catch (_) {}
+}
