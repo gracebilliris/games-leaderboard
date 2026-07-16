@@ -170,7 +170,9 @@ function renderAll() {
   const teams = computeTeamTotals(DATA.teams, players);
 
   const dateStr = DATA.date ? new Date(DATA.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
-  document.getElementById('subtitle').textContent = [DATA.event, dateStr, `${holes} holes`].filter(Boolean).join(' · ');
+  const parts = [DATA.event, dateStr, `${holes} holes`].filter(Boolean).join(' · ');
+  const notes = DATA.notes ? ` — ${DATA.notes}` : '';
+  document.getElementById('subtitle').textContent = parts + notes;
 
   renderTeamTable(teams);
   renderPlayerTable(players, DATA.teams, 'total');

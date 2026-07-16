@@ -1,17 +1,18 @@
 {
   "event": "Putt Putt Championship",
   "date": "2026-07-17",
-  "holes": 18,
-  "teams": ["Team 1", "Team 2", "Team 3"],
+  "holes": 9,
+  "teams": ["Group 1", "Group 2", "Group 3"],
+  "notes": "Group 4 (Amil, Ash) did not start.",
   "players": [
-    { "name": "Player A1", "team": 0, "scores": [3,4,2,5,3,4,3,2,4,3,5,4,3,2,4,3,4,3] },
-    { "name": "Player A2", "team": 0, "scores": [4,3,3,4,4,3,5,3,4,4,4,3,4,3,3,4,3,4] },
-    { "name": "Player A3", "team": 0, "scores": [3,3,4,4,3,4,4,4,3,4,3,4,4,3,4,3,4,3] },
-    { "name": "Player B1", "team": 1, "scores": [4,4,3,5,4,4,3,3,5,4,4,4,3,4,4,3,4,4] },
-    { "name": "Player B2", "team": 1, "scores": [3,5,4,4,3,5,4,3,4,3,5,4,4,3,4,4,3,5] },
-    { "name": "Player B3", "team": 1, "scores": [4,4,4,3,4,4,3,4,4,4,3,4,3,4,3,4,4,3] },
-    { "name": "Player C1", "team": 2, "scores": [5,4,3,4,5,3,4,4,3,5,4,3,4,5,3,4,4,3] },
-    { "name": "Player C2", "team": 2, "scores": [4,5,4,3,4,4,5,3,4,3,4,5,3,4,4,4,3,5] },
-    { "name": "Player C3", "team": 2, "scores": [4,3,5,4,3,4,4,5,3,4,4,3,5,3,4,3,4,4] }
+    { "name": "Matt",   "team": 0, "scores": [4, 5, 3, 3, 5, 2, 4, 2, -1] },
+    { "name": "Grace",  "team": 0, "scores": [1, 6, 3, 3, 1, 3, 3, 2,  3] },
+    { "name": "Ruby",   "team": 0, "scores": [1, 5, 1, 3, 3, 2, 4, 1,  8] },
+    { "name": "Justin", "team": 1, "scores": [5, 4, 3, 3, 1, 4, 5, 5, -1] },
+    { "name": "Glen",   "team": 1, "scores": [2, 4, 6, 4, 1, 2, 3, 3,  3] },
+    { "name": "Wendi",  "team": 1, "scores": [2, 4, 3, 2, 3, 2, 3, 7, 10] },
+    { "name": "Jeremy", "team": 2, "scores": [2, 5, 1, 3, 3, 2, 2, 2, -1] },
+    { "name": "Leo",    "team": 2, "scores": [4, 4, 5, 3, 3, 3, 6, 2,  6] },
+    { "name": "Nico",   "team": 2, "scores": [6, 5, 3, 4, 3, 3, 2, 6,  2] }
   ]
 }
