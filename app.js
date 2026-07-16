@@ -4,6 +4,8 @@ const TEAM_COLORS = {
   2: { bg: '#2a1e3a', fg: '#c084fc', border: '#a855f7' },
 };
 
+TEAM_COLORS[3] = { bg: '#3a1e2a', fg: '#f472b6', border: '#ec4899' };
+
 let DATA = null;
 
 async function loadData() {
@@ -19,22 +21,25 @@ async function loadData() {
 function computePlayerTotals(players) {
   return players.map(p => ({
     ...p,
-    total: p.scores.reduce((a, b) => a + b, 0),
-    best: Math.min(...p.scores),
-    worst: Math.max(...p.scores),
+    total: p.dns ? null : p.scores.reduce((a, b) => a + b, 0),
+    best: p.dns || p.scores.length === 0 ? null : Math.min(...p.scores),
+    worst: p.dns || p.scores.length === 0 ? null : Math.max(...p.scores),
   }));
 }
 
 function computeTeamTotals(teams, players) {
   return teams.map((t, i) => {
     const roster = players.filter(p => p.team === i);
-    const total = roster.reduce((s, p) => s + p.total, 0);
+    const active = roster.filter(p => !p.dns);
+    const dns = active.length === 0 && roster.length > 0;
+    const total = active.reduce((s, p) => s + p.total, 0);
     return {
       name: t,
       index: i,
       players: roster,
-      total,
-      avg: roster.length ? total / roster.length : 0,
+      total: dns ? null : total,
+      avg: !dns && active.length ? total / active.length : null,
+      dns,
     };
   });
 }
@@ -48,39 +53,65 @@ function rankRowClass(i) {
 
 function renderTeamTable(teams) {
   const tbody = document.querySelector('#team-table tbody');
-  const sorted = [...teams].sort((a, b) => a.total - b.total);
-  tbody.innerHTML = sorted.map((t, i) => {
-    const c = TEAM_COLORS[t.index];
-    return `<tr class="${rankRowClass(i)}">
-      <td>${i + 1}</td>
-      <td><span class="team-badge" style="background:${c.bg};color:${c.fg};border-color:${c.border}">${t.name}</span></td>
-      <td>${t.players.map(p => p.name).join(', ')}</td>
-      <td><strong>${t.total}</strong></td>
-      <td>${t.avg.toFixed(1)}</td>
-    </tr>`;
-  }).join('');
+  const active = teams.filter(t => !t.dns).sort((a, b) => a.total - b.total);
+  const dns = teams.filter(t => t.dns);
+  const rows = [
+    ...active.map((t, i) => {
+      const c = TEAM_COLORS[t.index] || TEAM_COLORS[0];
+      return `<tr class="${rankRowClass(i)}">
+        <td>${i + 1}</td>
+        <td><span class="team-badge" style="background:${c.bg};color:${c.fg};border-color:${c.border}">${t.name}</span></td>
+        <td>${t.players.map(p => p.name).join(', ')}</td>
+        <td><strong>${t.total}</strong></td>
+        <td>${t.avg.toFixed(1)}</td>
+      </tr>`;
+    }),
+    ...dns.map(t => {
+      const c = TEAM_COLORS[t.index] || TEAM_COLORS[0];
+      return `<tr class="dns-row">
+        <td>—</td>
+        <td><span class="team-badge" style="background:${c.bg};color:${c.fg};border-color:${c.border}">${t.name}</span></td>
+        <td>${t.players.map(p => p.name).join(', ')}</td>
+        <td colspan="2"><span class="dns-tag">DNS</span></td>
+      </tr>`;
+    }),
+  ];
+  tbody.innerHTML = rows.join('');
 }
 
 function renderPlayerTable(players, teams, sortMode) {
   const tbody = document.querySelector('#player-table tbody');
-  const sorted = [...players];
+  const active = players.filter(p => !p.dns);
+  const dns = players.filter(p => p.dns);
   switch (sortMode) {
-    case 'total-desc': sorted.sort((a, b) => b.total - a.total); break;
-    case 'name': sorted.sort((a, b) => a.name.localeCompare(b.name)); break;
-    case 'team': sorted.sort((a, b) => a.team - b.team || a.total - b.total); break;
-    default: sorted.sort((a, b) => a.total - b.total);
+    case 'total-desc': active.sort((a, b) => b.total - a.total); break;
+    case 'name': active.sort((a, b) => a.name.localeCompare(b.name)); break;
+    case 'team': active.sort((a, b) => a.team - b.team || a.total - b.total); break;
+    default: active.sort((a, b) => a.total - b.total);
   }
-  tbody.innerHTML = sorted.map((p, i) => {
-    const c = TEAM_COLORS[p.team];
-    return `<tr class="${sortMode === 'total' ? rankRowClass(i) : ''}">
-      <td>${i + 1}</td>
-      <td>${p.name}</td>
-      <td><span class="team-badge" style="background:${c.bg};color:${c.fg};border-color:${c.border}">${teams[p.team]}</span></td>
-      <td><strong>${p.total}</strong></td>
-      <td>${p.best}</td>
-      <td>${p.worst}</td>
-    </tr>`;
-  }).join('');
+  const rows = [
+    ...active.map((p, i) => {
+      const c = TEAM_COLORS[p.team] || TEAM_COLORS[0];
+      return `<tr class="${sortMode === 'total' ? rankRowClass(i) : ''}">
+        <td>${i + 1}</td>
+        <td>${p.name}</td>
+        <td><span class="team-badge" style="background:${c.bg};color:${c.fg};border-color:${c.border}">${teams[p.team]}</span></td>
+        <td><strong>${p.total}</strong></td>
+        <td>${p.best}</td>
+        <td>${p.worst}</td>
+      </tr>`;
+    }),
+    ...dns.map(p => {
+      const c = TEAM_COLORS[p.team] || TEAM_COLORS[0];
+      return `<tr class="dns-row">
+        <td>—</td>
+        <td>${p.name}</td>
+        <td><span class="team-badge" style="background:${c.bg};color:${c.fg};border-color:${c.border}">${teams[p.team]}</span></td>
+        <td colspan="3"><span class="dns-tag">DNS</span></td>
+      </tr>`;
+    }),
+  ];
+  tbody.innerHTML = rows.join('');
 }
 
 function scoreColor(score, min, max) {
@@ -92,7 +123,9 @@ function scoreColor(score, min, max) {
 
 function renderScorecard(players, holes) {
   const table = document.querySelector('#scorecard');
-  const allScores = players.flatMap(p => p.scores);
+  const active = players.filter(p => !p.dns);
+  const dns = players.filter(p => p.dns);
+  const allScores = active.flatMap(p => p.scores);
   const min = Math.min(...allScores);
   const max = Math.max(...allScores);
 
@@ -100,7 +133,7 @@ function renderScorecard(players, holes) {
     Array.from({ length: holes }, (_, i) => `<th>H${i + 1}</th>`).join('')
   }<th>Total</th></tr></thead>`;
 
-  const body = `<tbody>${players.map(p => `
+  const activeRows = active.map(p => `
     <tr>
       <td>${p.name}</td>
       ${p.scores.map(s => {
@@ -108,16 +141,22 @@ function renderScorecard(players, holes) {
         return `<td><span class="cell" style="background:${c.bg};color:${c.fg}">${s}</span></td>`;
       }).join('')}
       <td class="total-col">${p.total}</td>
-    </tr>`).join('')}</tbody>`;
+    </tr>`).join('');
 
-  table.innerHTML = head + body;
+  const dnsRows = dns.map(p => `
+    <tr class="dns-row">
+      <td>${p.name}</td>
+      <td colspan="${holes + 1}"><span class="dns-tag">DNS</span></td>
+    </tr>`).join('');
+
+  table.innerHTML = head + `<tbody>${activeRows}${dnsRows}</tbody>`;
 }
 
 let chartInstance = null;
 function renderChart(players, teams, holes) {
   const ctx = document.getElementById('chart');
-  const datasets = players.map(p => {
-    const c = TEAM_COLORS[p.team];
+  const datasets = players.filter(p => !p.dns).map(p => {
+    const c = TEAM_COLORS[p.team] || TEAM_COLORS[0];
     let running = 0;
     const cumulative = p.scores.map(s => (running += s));
     return {
@@ -165,7 +204,7 @@ function renderAll() {
     renderEmpty();
     return;
   }
-  const holes = DATA.holes || DATA.players[0].scores.length;
+  const holes = DATA.holes || (DATA.players.find(p => !p.dns) || DATA.players[0]).scores.length;
   const players = computePlayerTotals(DATA.players);
   const teams = computeTeamTotals(DATA.teams, players);
 
