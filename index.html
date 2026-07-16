@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Putt Putt Leaderboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⛳%3C/text%3E%3C/svg%3E" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>⛳ Putt Putt Leaderboard</h1>
+    <p class="subtitle" id="subtitle">Loading results…</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="section-head">
+        <h2>Team Standings</h2>
+        <span class="hint">Lower total is better</span>
+      </div>
+      <table id="team-table" class="ranked">
+        <thead>
+          <tr><th>#</th><th>Team</th><th>Players</th><th>Total</th><th>Avg / Player</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>Player Leaderboard</h2>
+        <div class="controls">
+          <label>Sort by
+            <select id="sort-select">
+              <option value="total">Total (asc)</option>
+              <option value="total-desc">Total (desc)</option>
+              <option value="name">Name</option>
+              <option value="team">Team</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <table id="player-table" class="ranked">
+        <thead>
+          <tr><th>#</th><th>Player</th><th>Team</th><th>Total</th><th>Best Hole</th><th>Worst Hole</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>Hole-by-Hole Scorecard</h2>
+        <span class="hint">Colour = strokes (green = better)</span>
+      </div>
+      <div class="scroll-x">
+        <table id="scorecard" class="scorecard"></table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head"><h2>Cumulative Strokes per Hole</h2></div>
+      <canvas id="chart" height="120"></canvas>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built with ⛳ · <a href="data.json">data.json</a></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
