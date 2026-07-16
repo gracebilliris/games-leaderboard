@@ -204,6 +204,7 @@ footer a { color: var(--accent); text-decoration: none; }
   padding: 1rem;
   cursor: zoom-out;
 }
+.lightbox[hidden] { display: none; }
 .lightbox img {
   max-width: 95vw;
   max-height: 92vh;
